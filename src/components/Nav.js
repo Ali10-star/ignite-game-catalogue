@@ -88,7 +88,7 @@ const StyledNav = styled(motion.div)`
             border: 1px solid #ff7676;
         }
     }
-`;
+    `;
 
 const Logo = styled(motion.div)`
     display: flex;
@@ -97,10 +97,14 @@ const Logo = styled(motion.div)`
     gap: 0.5rem;
     padding: 1rem 0;
     cursor: pointer;
+    transition: all 0.4s ease;
 
     img {
         width: 2rem;
         height: 2rem;
+    }
+    &:hover {
+        color: #ff7676;
     }
 `;
 

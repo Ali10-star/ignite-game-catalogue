@@ -69,6 +69,11 @@ const GameDetail = ({ pathId }) => {
     }
 
 
+    const tagStyling = {
+        color: `#${game.dominant_color}`,
+        backgroundColor: `#${game.dominant_color}10`,
+    }
+
     return (
         <>
         {!isLoading && (
@@ -77,14 +82,19 @@ const GameDetail = ({ pathId }) => {
                     <Stats>
                         <Rating>
                             <motion.h3 layoutId={`title ${game.id.toString()}`}>{game.name}</motion.h3>
+                            <span className='release'>Released in {game.released.split("-")[0]}</span>
                             <span className="rating"><p>Rating: {game.rating}</p>{getStars()}</span>
+                            <Genres>
+                                {game.genres.map(genre => <span key={genre.id}>{genre.name}</span>)}
+                            </Genres>
                         </Rating>
                         <Info>
                             <h3>Platforms</h3>
                             <Platforms>
                                 {game.platforms.map(data => (
                                     <PlatformPill>
-                                    <img key={data.platform.id} src={getPlatformIcon(data.platform.name)} alt="" />
+                                        <img key={data.platform.id} src={getPlatformIcon(data.platform.name)} alt="" />
+                                        <h5 key={data.platform.id}>{data.platform.name}</h5>
                                     </PlatformPill>
                                 ))}
                             </Platforms>
@@ -95,11 +105,33 @@ const GameDetail = ({ pathId }) => {
                         <motion.img layoutId={`image ${game.id.toString()}`} src={resizeImage(game.background_image, 1280)} alt="" />
                     </Media>
 
+                    <div style={{display: 'flex', justifyContent: 'space-between', gap: '0.5rem'}}>
+                        <Developers>
+                            <h4>Developed By</h4>
+                            <div className="devs">
+                                {game.developers.map(dev => <span key={dev.id}>{dev.name}</span>)}
+                            </div>
+                        </Developers>
+
+                        <Publishers>
+                            <h4>Published By</h4>
+                            <div className="pubs">
+                                {game.publishers.map(pub => <span key={pub.id}>{pub.name}</span>)}
+                            </div>
+                        </Publishers>
+                    </div>
+
                     <Description>
-                        <p>{game.description_raw}</p>
+                        <h3>Overview</h3>
+                        {/* <p>{game.description_raw}</p> */}
+                        <p dangerouslySetInnerHTML={{ __html: game.description }}></p>
                     </Description>
 
-                    <h3>Game Screenshots:</h3>
+                    <Tags>
+                        {game.tags.map(tag => tag.language === 'eng' && <span style={tagStyling} key={tag.id} >{tag.name}</span> )}
+                    </Tags>
+
+                    <h3>Game Screenshots</h3>
                     <Gallery>
                         {screenshots.results.map(photo => (
                             <img key={photo.id} src={resizeImage(photo.image, 1280)} alt="" />
@@ -142,10 +174,8 @@ const Detail = styled(motion.div)`
     img {
         width: 100%;
     }
-
-    @media screen and (max-width: 30rem) {
-        width: 90%;
-        left: 5%;
+    @media screen and (max-width: 767px) {
+        padding-bottom: 1rem;
     }
 `;
 
@@ -159,6 +189,13 @@ const Rating = styled(motion.div)`
     h3 {
         color: #ff7676;
     }
+
+    span.release {
+        color: #676767;
+        font-weight: lighter;
+        font-size: 0.9rem;
+    }
+
     img {
         --size: 1rem;
         width: var(--size);
@@ -180,6 +217,15 @@ const Rating = styled(motion.div)`
     }
 `;
 
+const Genres = styled(motion.div)`
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    padding-top: 1rem;
+    font-size: 0.8rem;
+    font-weight: bold;
+    font-style: italic;
+`;
 const Info = styled(motion.div)`
     text-align: center;
     max-width: 50%;
@@ -201,17 +247,39 @@ const Platforms = styled(motion.div)`
 const PlatformPill = styled(motion.div)`
     background-color: ghostwhite;
     border-radius: 20px;
-    padding: 0.5rem;
+    padding: 1rem;
     display: flex;
     align-items: center;
     justify-content: center;
     flex: 1;
+    transition: all 0.3s ease;
+    height: 2.8rem;
+
+    h5 {
+        color: white;
+        width: 2.8rem;
+        font-size: 0.8rem;
+        word-wrap: break-word;
+        display: none;
+        cursor: default;
+    }
 
     img {
-        height: 2.5rem;
-        width: 2.5rem;
+        height: 2.8rem;
+        width: 2.8rem;
         object-fit: contain;
     }
+
+    &:hover {
+        background-color: #ff7676;
+        img {
+            display: none;
+        }
+        h5 {
+            display: inline;
+        }
+    }
+
     @media screen and (max-width: 767px) {
         transform: scale(0.85);
     }
@@ -225,14 +293,58 @@ const Media = styled(motion.div)`
     }
 `;
 
+const Developers = styled(motion.div)`
+    padding-top: 2rem;
+
+    h4 {
+        color: #ff7676;
+        font-weight: 500;
+    }
+    .devs {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+        font-size: 0.8rem;
+        color: #676767;
+    }
+    `;
+
+const Publishers = styled(motion.div)`
+    padding-top: 2rem;
+
+    h4 {
+        color: #ff7676;
+        font-weight: 500;
+    }
+    .pubs {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+        font-size: 0.8rem;
+        color: #676767;
+    }
+`;
+
 const Description = styled(motion.div)`
     margin: 3rem 0rem;
 
     p {
         font-size: 1em;
-        @media screen and (max-width: 767px) {
-            font-size: 0.8em;
-        }
+    }
+`;
+
+const Tags = styled(motion.div)`
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+
+    span {
+        border-radius: 10px;
+        font-size: 0.8rem;
+        padding: 0.3rem;
+        border: none;
+        color: blue;
+        cursor: default;
     }
 `;
 

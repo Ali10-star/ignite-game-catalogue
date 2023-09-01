@@ -21,6 +21,7 @@ const GlobalStyels = createGlobalStyle`
     body {
         font-family: 'Montserrat', sans-serif;
         width: 100%;
+        margin-bottom: 1rem;
     }
 
     h2 {
